@@ -1,4 +1,5 @@
 import edu.usu.graphics.*;
+import org.joml.Vector3f;
 
 import java.util.Objects;
 
@@ -15,6 +16,7 @@ public class Game {
         pause,
     };
 
+    private Level level;
     private Font font;
 
     private KeyboardInput input;
@@ -30,14 +32,25 @@ public class Game {
 
     public void initialize() {
 
-        current_state = gameStates.menu;
+        current_state = gameStates.game;
 
         menu = new Menu();
         input = new KeyboardInput();
         menu_input = new KeyboardInput();
         pause = false;
 
+        level = new Level();
+
         font = new Font("Arial", java.awt.Font.PLAIN, 42, true);
+
+        input.registerCommand(GLFW_KEY_SPACE,true,(double elapsedTime) -> {
+            System.out.println("UP KEY PRESSED");
+
+            level = new Level();
+            menu.upOption();
+
+
+        });
 
         //different game states use different controls
         menu_input.registerCommand(GLFW_KEY_UP,true,(double elapsedTime) -> {
@@ -64,7 +77,7 @@ public class Game {
                 glfwSetWindowShouldClose(graphics.getWindow(), true);
             } else if (current_state == gameStates.game){
                 pause = !pause;
-
+                glfwSetWindowShouldClose(graphics.getWindow(), true);
             }
             else current_state = gameStates.menu;
 
@@ -99,7 +112,7 @@ public class Game {
             menu_input.update(elapsedTime,graphics);
 
         } else{
-            input.update(elapsedTime,graphics);
+            menu_input.update(elapsedTime,graphics);
         }
         // If user presses ESC, then exit the program
         if (glfwGetKey(graphics.getWindow(), GLFW_KEY_ENTER) == GLFW_PRESS){
@@ -179,6 +192,8 @@ public class Game {
                 break;
             case gameStates.game:
                 graphics.drawTextByHeight(font, "GAME", position_x, position_y, 0.075f, Color.WHITE);
+
+                level.render_level(graphics);
                 // Code to execute if expression equals value2
                 break;
             case gameStates.options:
