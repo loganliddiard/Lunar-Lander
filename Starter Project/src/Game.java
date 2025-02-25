@@ -7,6 +7,8 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class Game {
     private final Graphics2D graphics;
+    private Ship player_ship;
+
     private enum gameStates{
         menu,
         game,
@@ -31,7 +33,7 @@ public class Game {
     }
 
     public void initialize() {
-
+        player_ship = new Ship();
         current_state = gameStates.game;
 
         menu = new Menu();
@@ -43,11 +45,22 @@ public class Game {
 
         font = new Font("Arial", java.awt.Font.PLAIN, 42, true);
 
-        input.registerCommand(GLFW_KEY_SPACE,true,(double elapsedTime) -> {
+        input.registerCommand(GLFW_KEY_SPACE,false,(double elapsedTime) -> {
             System.out.println("UP KEY PRESSED");
 
             level = new Level();
-            menu.upOption();
+        });
+        input.registerCommand(GLFW_KEY_LEFT,false,(double elapsedTime) -> {
+            player_ship.rotateLeft();
+
+        });
+        input.registerCommand(GLFW_KEY_RIGHT,false,(double elapsedTime) -> {
+            player_ship.rotateRight();
+
+
+        });
+        input.registerCommand(GLFW_KEY_UP,false,(double elapsedTime) -> {
+            player_ship.thrust();
 
 
         });
@@ -155,6 +168,8 @@ public class Game {
                 break;
             case gameStates.game:
                 // Code to execute if expression equals value2
+
+                player_ship.updateShip(elapsedTime);
                 break;
             case gameStates.options:
                 // Code to execute if expression equals value3
@@ -194,6 +209,7 @@ public class Game {
                 graphics.drawTextByHeight(font, "GAME", position_x, position_y, 0.075f, Color.WHITE);
 
                 level.render_level(graphics);
+                player_ship.renderShip(graphics);
                 // Code to execute if expression equals value2
                 break;
             case gameStates.options:
