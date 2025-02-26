@@ -155,7 +155,7 @@ public class Ship {
 
                 if(checkAngle() && getSpeed() < 5){
                     landed = true;
-                }
+                } else crashed = true;
 
             }
             return true;
@@ -167,7 +167,7 @@ public class Ship {
 
                 if(checkAngle() && getSpeed() < 5){
                     landed = true;
-                }
+                } else crashed = true;
 
             }
             return true;
