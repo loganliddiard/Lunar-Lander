@@ -49,7 +49,7 @@ public class Level {
 
 
         terrain[mid] = Math.max(-0.25f, Math.min(0.5f, avg+r));
-        System.out.println(terrain[mid]);
+
 
         // Reduce roughness dynamically for smoother transitions
         double newRoughness = roughness * 0.9; // Adjust decay factor as needed
@@ -103,5 +103,21 @@ public class Level {
             }
             zoneWidth = zoneWidth / 2;
         }
+    }
+
+    public double[] getTerrain(){
+
+        return terrain;
+
+    }
+    public float getWidth(){
+
+        return WIDTH;
+
+    }
+
+    public float getOffset(){
+
+        return CORNER_LEFT;
     }
 }

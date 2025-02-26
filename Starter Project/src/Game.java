@@ -1,4 +1,5 @@
 import edu.usu.graphics.*;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 import java.util.Objects;
@@ -47,7 +48,7 @@ public class Game {
 
         input.registerCommand(GLFW_KEY_SPACE,false,(double elapsedTime) -> {
             System.out.println("UP KEY PRESSED");
-
+            player_ship = new Ship();
             level = new Level();
         });
         input.registerCommand(GLFW_KEY_LEFT,false,(double elapsedTime) -> {
@@ -170,6 +171,24 @@ public class Game {
                 // Code to execute if expression equals value2
 
                 player_ship.updateShip(elapsedTime);
+
+                double[] terrain = level.getTerrain();
+                double width = level.getWidth();
+                float offset = level.getOffset();
+
+                for (int i = 0; i < terrain.length-2;i++){
+                    float x1 = (float) (((i * width) / (terrain.length - 1)) + offset);
+                    float y1 = (float) terrain[i]; // Ensure values are properly scaled
+                    float x2 = (float) ((((i+1) * width) / (terrain.length - 1)) + offset);
+                    float y2 = (float) terrain[i+1]; // Ensure values are properly scaled
+                    Vector2f point_1 = new Vector2f(x1,y1) ;
+                    Vector2f point_2 = new Vector2f(x2,y2);
+
+                    boolean safespace = y1 == y2;
+
+                    player_ship.checkCollisions(point_1,point_2,.015f,safespace);
+                }
+
                 break;
             case gameStates.options:
                 // Code to execute if expression equals value3
@@ -210,6 +229,7 @@ public class Game {
 
                 level.render_level(graphics);
                 player_ship.renderShip(graphics);
+                player_ship.renderShipHUD(graphics,font);
                 // Code to execute if expression equals value2
                 break;
             case gameStates.options:
