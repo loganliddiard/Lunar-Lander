@@ -36,7 +36,7 @@ public class Ship {
         position = new Vector2f(x, y);
         offset = new Vector2f(x-(lengths/2), y+(lengths/2));
         galaga = new Texture("resources/images/RedGalaga.png");
-        gravity = 0.0000025f;
+        gravity = 0.000025f;
     }
 
     public void thrust() {
@@ -45,7 +45,7 @@ public class Ship {
 
             double radians = Math.toRadians(angle);
 
-            float thrustPower = 0.00002f; // Adjust thrust power for balance
+            float thrustPower = 0.0001f; // Adjust thrust power for balance
 
             // Update velocity based on ship's direction
             velocity.x += (float) Math.cos(radians) * thrustPower;
@@ -153,7 +153,7 @@ public class Ship {
                 crashed = true;
             } else {
 
-                if(checkAngle() && getSpeed() < 5){
+                if(checkAngle() && getSpeed() < 2){
                     landed = true;
                 } else crashed = true;
 
@@ -165,7 +165,7 @@ public class Ship {
                 crashed = true;
             } else {
 
-                if(checkAngle() && getSpeed() < 5){
+                if(checkAngle() && getSpeed() < 2){
                     landed = true;
                 } else crashed = true;
 
@@ -186,10 +186,10 @@ public class Ship {
         if (tempangle >=0 && tempangle <=5){
             return true;
         }
-        System.out.println("FAILED ANGLE");
+
         return false;
     }
     private double getSpeed() {
-        return Math.sqrt(velocity.x * velocity.x + velocity.y * velocity.y);
+        return Math.abs(velocity.y)*1000;
     }
 }

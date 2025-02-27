@@ -164,10 +164,10 @@ public class Game {
     private void update(double elapsedTime) {
 
         switch (current_state) {
-            case gameStates.menu:
+            case menu:
                 // Code to execute if expression equals value1
                 break;
-            case gameStates.game:
+            case game:
                 // Code to execute if expression equals value2
 
                 player_ship.updateShip(elapsedTime);
@@ -190,14 +190,14 @@ public class Game {
                 }
 
                 break;
-            case gameStates.options:
+            case options:
                 // Code to execute if expression equals value3
                 break;
-            case gameStates.scores:
+            case scores:
                 // Code to execute if expression equals value4
                 break;
             // ... more cases
-            case gameStates.credits:
+            case credits:
                 break;
         }
     }
@@ -207,7 +207,7 @@ public class Game {
         float position_x = -0.5f;
         float position_y = -0.25f;
         switch (current_state) {
-            case gameStates.menu:
+            case menu:
                 // Code to execute if expression equals value1
 
                 for(String option: menu.getOptions()){
@@ -224,7 +224,7 @@ public class Game {
 
 
                 break;
-            case gameStates.game:
+            case game:
                 graphics.drawTextByHeight(font, "GAME", position_x, position_y, 0.075f, Color.WHITE);
 
                 level.render_level(graphics);
@@ -232,17 +232,17 @@ public class Game {
                 player_ship.renderShipHUD(graphics,font);
                 // Code to execute if expression equals value2
                 break;
-            case gameStates.options:
+            case options:
                 graphics.drawTextByHeight(font, "OPTIONS", position_x, position_y, 0.075f, Color.WHITE);
                 // Code to execute if expression equals value2
                 break;
-            case gameStates.scores:
+            case scores:
                 graphics.drawTextByHeight(font, "SCORES", position_x, position_y, 0.075f, Color.WHITE);
 
                 // Code to execute if expression equals value2
                 break;
             // ... more cases
-            case gameStates.credits:
+            case credits:
                 graphics.drawTextByHeight(font, "CREDITS", position_x, position_y, 0.075f, Color.WHITE);
                 break;
 
