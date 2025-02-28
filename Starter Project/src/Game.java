@@ -236,6 +236,8 @@ public class Game {
     private void render(double elapsedTime) {
         graphics.begin();
 
+        Rectangle box = new Rectangle(LHS,TOP,screen_size,screen_height,-1);
+        graphics.draw(background,box,Color.WHITE);
 
 
         //Draw boarder
