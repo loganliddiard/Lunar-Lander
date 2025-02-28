@@ -7,6 +7,7 @@ import java.util.Objects;
 import static org.lwjgl.glfw.GLFW.*;
 
 public class Game {
+
     private final Graphics2D graphics;
     private Ship player_ship;
 
@@ -21,6 +22,8 @@ public class Game {
 
     private Level level;
     private Font font;
+    private Font title_font;
+    private Font sub_font;
 
     private KeyboardInput input;
     private KeyboardInput menu_input;
@@ -29,13 +32,23 @@ public class Game {
 
     private boolean pause;
 
+    //Draw boarder
+    final float screen_size = 1.2f;
+    final float screen_height = 1.0f;
+    final float FRAMETHICKNESS = 0.005f;
+    private static final float LHS = -0.6f;
+    private static final float TOP = -0.5f;
+
+    private Texture background;
+
+
     public Game(Graphics2D graphics) {
         this.graphics = graphics;
     }
 
     public void initialize() {
         player_ship = new Ship();
-        current_state = gameStates.game;
+        current_state = gameStates.menu;
 
         menu = new Menu();
         input = new KeyboardInput();
@@ -44,8 +57,17 @@ public class Game {
 
         level = new Level();
 
-        font = new Font("Arial", java.awt.Font.PLAIN, 42, true);
+        font = new Font("Arial", java.awt.Font.PLAIN, 84, false);
 
+        background = new Texture("resources/images/galaxy.png");
+
+        // Key size is 36
+        // Best height is .05
+        title_font = new Font("resources/fonts/karmatic-arcade/ka1.ttf", 36, true);
+
+        //max size is 60
+        //needs to be size 64 with font height of .07
+        sub_font = new Font("resources/fonts/dedicool/Dedicool.ttf", 64, true);
         input.registerCommand(GLFW_KEY_SPACE,false,(double elapsedTime) -> {
             System.out.println("UP KEY PRESSED");
             player_ship = new Ship();
@@ -63,8 +85,12 @@ public class Game {
         input.registerCommand(GLFW_KEY_UP,false,(double elapsedTime) -> {
             player_ship.thrust();
 
+        });
+        input.registerCommand(GLFW_KEY_ESCAPE,true,(double elapsedTime) -> {
+            pause = !pause;
 
         });
+
 
         //different game states use different controls
         menu_input.registerCommand(GLFW_KEY_UP,true,(double elapsedTime) -> {
@@ -90,8 +116,8 @@ public class Game {
             if (current_state == gameStates.menu){
                 glfwSetWindowShouldClose(graphics.getWindow(), true);
             } else if (current_state == gameStates.game){
-                pause = !pause;
-                glfwSetWindowShouldClose(graphics.getWindow(), true);
+                //pause = !pause;
+
             }
             else current_state = gameStates.menu;
 
@@ -170,24 +196,29 @@ public class Game {
             case game:
                 // Code to execute if expression equals value2
 
-                player_ship.updateShip(elapsedTime);
+                //If paused hold on updating
+                if(!pause){
+                    player_ship.updateShip(elapsedTime);
 
-                double[] terrain = level.getTerrain();
-                double width = level.getWidth();
-                float offset = level.getOffset();
+                    double[] terrain = level.getTerrain();
+                    double width = level.getWidth();
+                    float offset = level.getOffset();
 
-                for (int i = 0; i < terrain.length-2;i++){
-                    float x1 = (float) (((i * width) / (terrain.length - 1)) + offset);
-                    float y1 = (float) terrain[i]; // Ensure values are properly scaled
-                    float x2 = (float) ((((i+1) * width) / (terrain.length - 1)) + offset);
-                    float y2 = (float) terrain[i+1]; // Ensure values are properly scaled
-                    Vector2f point_1 = new Vector2f(x1,y1) ;
-                    Vector2f point_2 = new Vector2f(x2,y2);
+                    for (int i = 0; i < terrain.length-2;i++){
+                        float x1 = (float) (((i * width) / (terrain.length - 1)) + offset);
+                        float y1 = (float) terrain[i]; // Ensure values are properly scaled
+                        float x2 = (float) ((((i+1) * width) / (terrain.length - 1)) + offset);
+                        float y2 = (float) terrain[i+1]; // Ensure values are properly scaled
+                        Vector2f point_1 = new Vector2f(x1,y1) ;
+                        Vector2f point_2 = new Vector2f(x2,y2);
 
-                    boolean safespace = y1 == y2;
+                        boolean safespace = y1 == y2;
 
-                    player_ship.checkCollisions(point_1,point_2,.015f,safespace);
+                        player_ship.checkCollisions(point_1,point_2,.015f,safespace);
+                    }
+
                 }
+
 
                 break;
             case options:
@@ -204,19 +235,45 @@ public class Game {
 
     private void render(double elapsedTime) {
         graphics.begin();
+
+
+
+        //Draw boarder
+        Rectangle line1 = new Rectangle(LHS,TOP,screen_size,FRAMETHICKNESS);
+        Rectangle line2 = new Rectangle(LHS,-TOP,screen_size,FRAMETHICKNESS);
+        Rectangle line3 = new Rectangle(-LHS,TOP,FRAMETHICKNESS,screen_height);
+        Rectangle line4 = new Rectangle(LHS,TOP,FRAMETHICKNESS,screen_height);
+
+        Color frame_color = Color.WHITE;
+
+        graphics.draw(line1,frame_color);
+        graphics.draw(line2,frame_color);
+        graphics.draw(line3,frame_color);
+        graphics.draw(line4,frame_color);
+
+        float title_position_y = -0.35f;
+        float title_position_x = -0.5f;
+        float title_textHeight = .05f;
+
         float position_x = -0.5f;
-        float position_y = -0.25f;
+        float position_y = -0.15f;
+        float textHeight = .045f;
+
+
+
         switch (current_state) {
             case menu:
-                // Code to execute if expression equals value1
+
+                graphics.drawTextByHeight(title_font, "LUNAR LANDER", title_position_x, title_position_y, title_textHeight, Color.WHITE);
+
 
                 for(String option: menu.getOptions()){
                     if(Objects.equals(option, menu.getHovering())){
-                        graphics.drawTextByHeight(font, option, position_x, position_y, 0.075f, Color.YELLOW);
+                        graphics.drawTextByHeight(sub_font, option, position_x, position_y, textHeight, Color.YELLOW);
 
                     }
                     else{
-                        graphics.drawTextByHeight(font, option, position_x, position_y, 0.075f, Color.WHITE);
+                        graphics.drawTextByHeight(sub_font, option, position_x, position_y, textHeight, Color.WHITE);
                     }
 
                     position_y = position_y + .075f;
@@ -225,27 +282,27 @@ public class Game {
 
                 break;
             case game:
-                graphics.drawTextByHeight(font, "GAME", position_x, position_y, 0.075f, Color.WHITE);
 
                 level.render_level(graphics);
                 player_ship.renderShip(graphics);
-                player_ship.renderShipHUD(graphics,font);
+                player_ship.renderShipHUD(graphics,sub_font);
                 // Code to execute if expression equals value2
+
+
                 break;
             case options:
-                graphics.drawTextByHeight(font, "OPTIONS", position_x, position_y, 0.075f, Color.WHITE);
+                graphics.drawTextByHeight(title_font, "OPTIONS", position_x, position_y, title_textHeight, Color.WHITE);
                 // Code to execute if expression equals value2
                 break;
             case scores:
-                graphics.drawTextByHeight(font, "SCORES", position_x, position_y, 0.075f, Color.WHITE);
+                graphics.drawTextByHeight(title_font, "SCORES", position_x, position_y, title_textHeight, Color.WHITE);
 
                 // Code to execute if expression equals value2
                 break;
             // ... more cases
             case credits:
-                graphics.drawTextByHeight(font, "CREDITS", position_x, position_y, 0.075f, Color.WHITE);
+                graphics.drawTextByHeight(title_font, "CREDITS", position_x, position_y, title_textHeight, Color.WHITE);
                 break;
-
         }
 
 

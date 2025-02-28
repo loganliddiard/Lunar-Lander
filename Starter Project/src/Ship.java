@@ -16,17 +16,26 @@ public class Ship {
     private Vector2f offset;
     private Rectangle ship;
     private float gravity;
-
+    private float fuel_usage;
     private float lengths;
 
+    private double max_fuel;
+    private enum fuel_status{
+        full,
+        medium,
+        low
+    }
+    private fuel_status status;
     private boolean landed;
     private boolean crashed;
 
     public Ship(){
 
-        turn_angle = 0.5f;
+        turn_angle = 0.75f;
         angle = 0f;
-
+        status = fuel_status.full;
+        fuel_usage = .05f;
+        max_fuel = 100.0;
         x = -0.0f;
         y = -0.40f;
         velocity = new Vector2f(0.0f, 0.0f);
@@ -36,7 +45,7 @@ public class Ship {
         position = new Vector2f(x, y);
         offset = new Vector2f(x-(lengths/2), y+(lengths/2));
         galaga = new Texture("resources/images/RedGalaga.png");
-        gravity = 0.000025f;
+        gravity = 0.000015f;
     }
 
     public void thrust() {
@@ -45,7 +54,7 @@ public class Ship {
 
             double radians = Math.toRadians(angle);
 
-            float thrustPower = 0.0001f; // Adjust thrust power for balance
+            float thrustPower = 0.00009f; // Adjust thrust power for balance
 
             // Update velocity based on ship's direction
             velocity.x += (float) Math.cos(radians) * thrustPower;
@@ -56,7 +65,7 @@ public class Ship {
     public void rotateRight(){
 
         if (fuel > 0 && !crashed && !landed){
-            fuel -= .01;
+            fuel -= fuel_usage;
             angle += turn_angle;
             if (angle > 360){
 
@@ -67,7 +76,7 @@ public class Ship {
     }
     public void rotateLeft(){
         if (fuel > 0 && !crashed && !landed){
-            fuel -= .01;
+            fuel -= fuel_usage;
             angle -= turn_angle;
             if (angle < 0){
 
@@ -93,18 +102,32 @@ public class Ship {
 
 
 
-        String show_fuel = "Fuel  : "+fuel;
-        String show_angle= "Angle : "+(angle+ 90) % 360;
-        String show_speed= "Speed : "+getSpeed();
+        String show_fuel = "Fuel  : "+String.format("%.2f", fuel);
+        String show_angle= "Angle : "+String.format("%.2f",(angle+ 90) % 360);
+        String show_speed= "Speed : "+String.format("%.2f",getSpeed())+" m/s";
 
         float start_x = .04f;
         float start_y = -.45f;
         float textHeight = .05f;
 
-        graphics.drawTextByHeight(font,show_fuel,start_x,start_y,textHeight,Color.PURPLE);
-        graphics.drawTextByHeight(font,show_angle,start_x,start_y+textHeight,textHeight,Color.PURPLE);
-        graphics.drawTextByHeight(font,show_speed,start_x,start_y+textHeight+textHeight,textHeight,Color.PURPLE);
-        graphics.drawTextByHeight(font,show_speed,start_x,start_y+textHeight+textHeight,textHeight,Color.PURPLE);
+        graphics.drawTextByHeight(font,show_fuel,start_x,start_y,textHeight,Color.WHITE);
+        graphics.drawTextByHeight(font,show_angle,start_x,start_y+textHeight,textHeight,Color.WHITE);
+
+        switch (status){
+
+            case full:
+                graphics.drawTextByHeight(font,show_fuel,start_x,start_y,textHeight,Color.GREEN);
+                break;
+            case medium:
+                graphics.drawTextByHeight(font,show_fuel,start_x,start_y,textHeight,Color.YELLOW);
+                break;
+            default:
+                graphics.drawTextByHeight(font,show_fuel,start_x,start_y,textHeight,Color.RED);
+                break;
+        }
+
+        graphics.drawTextByHeight(font,show_speed,start_x,start_y+textHeight+textHeight,textHeight,Color.WHITE);
+        graphics.drawTextByHeight(font,show_speed,start_x,start_y+textHeight+textHeight,textHeight,Color.WHITE);
         if(crashed) graphics.drawTextByHeight(font,"CRASHED",start_x,start_y+textHeight+textHeight+textHeight,textHeight,Color.RED);
         if(landed) graphics.drawTextByHeight(font,"LANDED",start_x,start_y+textHeight+textHeight+textHeight+textHeight,textHeight,Color.GREEN);
     }
@@ -114,6 +137,15 @@ public class Ship {
     public void updateShip(double elapsedTime){
 
         if(!crashed && !landed){
+
+            if (fuel > max_fuel /2){
+                status = fuel_status.full;
+            } else if(fuel > max_fuel /4){
+                status = fuel_status.medium;
+            } else{ status = fuel_status.low;}
+
+
+
             for(var i = 0; i < elapsedTime; i++){
 
                 velocity.y += gravity;

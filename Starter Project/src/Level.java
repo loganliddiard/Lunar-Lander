@@ -4,23 +4,24 @@ import org.joml.Vector3f;
 import java.util.Random;
 
 public class Level {
-    private static final float CORNER_LEFT = -0.5f;
-    private static final float WIDTH = 1.0f;  // Screen width
+    private static final float CORNER_LEFT = -0.6f;
+    private static final float WIDTH = 1.2f;  // Screen width
     private static final float HEIGHT = 1.0f; // Screen height
     private static final int NUM_POINTS = 257; // Must be 2^n + 1
     //private static final int NUM_POINTS = 17; // Must be 2^n + 1
-    private static final double INITIAL_ROUGHNESS = 1; // Adjust for more or less jaggedness
+    private static final double INITIAL_ROUGHNESS = .6; // Adjust for more or less jaggedness
     private double[] terrain = new double[NUM_POINTS]; // Store heights
-
+    private double[] safe_zones = new double[NUM_POINTS];
 
     public Level() {
+
         generateTerrain();
         addLandingZones();
 
     }
 
     private static double gaussianRandom(Random random) {
-        return random.nextGaussian(); // Mean 0, Variance 1
+        return random.nextGaussian();
     }
 
     private void generateTerrain() {
@@ -44,15 +45,11 @@ public class Level {
         double range = Math.abs(right - left) / (double) NUM_POINTS;
         double r = roughness * gaussianRandom(random) * range;
 
-        // Ensure y values stay within range
-
-
-
-        terrain[mid] = Math.max(-0.25f, Math.min(0.5f, avg+r));
+        terrain[mid] = Math.max(-0.3f, Math.min(0.5f, avg + r));
 
 
         // Reduce roughness dynamically for smoother transitions
-        double newRoughness = roughness * 0.9; // Adjust decay factor as needed
+        double newRoughness = roughness * 0.95; // Adjust decay factor as needed
 
         // Recursively apply midpoint displacement
         midpointDisplacement(left, mid, newRoughness, random);
@@ -60,6 +57,7 @@ public class Level {
     }
 
     public void render_level(Graphics2D graphics) {
+
 
         for (int i = 0; i < NUM_POINTS - 1; i++) {
             float x1 = ((i * WIDTH) / (NUM_POINTS - 1)) + CORNER_LEFT;
@@ -91,13 +89,25 @@ public class Level {
     }
     private void addLandingZones() {
         int numZones = 2; // Number of flat landing zones
-        int zoneWidth = NUM_POINTS / 8; // Width of each zone
+        int zoneWidth = NUM_POINTS / 8;
+
+        double lowerBound = 0 + 0.15 * (NUM_POINTS);
+    // Width of each zone
 
         Random random = new Random();
         for (int i = 0; i < numZones; i++) {
+            boolean done = false;
+            while (!done){
+                int start = (int) (lowerBound + random.nextDouble() * (NUM_POINTS - zoneWidth - 1));;
+                if(start > NUM_POINTS -1 || safe_zones[start] != 1){
+                    done = true;
+                }
+
+            }
             int start = random.nextInt(NUM_POINTS - zoneWidth - 1);
             for (int j = 0; j < zoneWidth; j++) {
                 terrain[start + j] = terrain[start]; // Flatten segment
+                safe_zones[start + j] = 1;
 
 
             }
