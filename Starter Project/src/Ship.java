@@ -1,3 +1,5 @@
+import edu.usu.audio.Sound;
+import edu.usu.audio.SoundManager;
 import edu.usu.graphics.*;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -28,8 +30,20 @@ public class Ship {
     private fuel_status status;
     private boolean landed;
     private boolean crashed;
+    private SoundManager audio;
+    private Sound crash_effect;
+    private Sound win_effect;
+    private Sound thrust_effect;
 
-    public Ship(){
+    private boolean finished;
+    public Ship(SoundManager audio){
+
+
+        crash_effect = audio.load("crash","resources/audio/retro-explode.ogg",false);
+        win_effect = audio.load("win","resources/audio/8-bit-victory.ogg",false);
+        thrust_effect = audio.load("thrust","resources/audio/thruster_noise.ogg",false);
+
+        finished = false;
 
         turn_angle = 0.75f;
         angle = 0f;
@@ -45,16 +59,28 @@ public class Ship {
         position = new Vector2f(x, y);
         offset = new Vector2f(x-(lengths/2), y+(lengths/2));
         galaga = new Texture("resources/images/RedGalaga.png");
-        gravity = 0.000015f;
+        gravity = 0.000025f;
     }
 
     public void thrust() {
         if (fuel > 0 && !crashed && !landed) {
             fuel -= 0.1; // Consume some fuel
 
+            //account for going under or rolling back to highest value;
+            if(fuel<= 0 || fuel > max_fuel+1){
+                fuel = 0;
+            }
+
+            if(!thrust_effect.isPlaying()){
+
+                thrust_effect.play();
+            }
+
+
+
             double radians = Math.toRadians(angle);
 
-            float thrustPower = 0.00009f; // Adjust thrust power for balance
+            float thrustPower = 0.00007f; // Adjust thrust power for balance
 
             // Update velocity based on ship's direction
             velocity.x += (float) Math.cos(radians) * thrustPower;
@@ -71,7 +97,6 @@ public class Ship {
 
                 angle = angle % 360;
             }
-
         }
     }
     public void rotateLeft(){
@@ -134,7 +159,7 @@ public class Ship {
 
 
 
-    public void updateShip(double elapsedTime){
+    public void updateShip(double elapsedTime,Sound level_music){
 
         if(!crashed && !landed){
 
@@ -144,8 +169,6 @@ public class Ship {
                 status = fuel_status.medium;
             } else{ status = fuel_status.low;}
 
-
-
             for(var i = 0; i < elapsedTime; i++){
 
                 velocity.y += gravity;
@@ -153,9 +176,18 @@ public class Ship {
                 position.x += velocity.x;
                 position.y += velocity.y;
 
-                System.out.println(position.y);
-
             }
+        }
+        else if (!finished&&crashed){
+            finished = true;
+            level_music.stop();
+            shipCrash();
+
+        }
+        else if (!finished&&landed){
+            finished = true;
+            shipWin();
+
         }
     }
 
@@ -221,7 +253,23 @@ public class Ship {
 
         return false;
     }
+
+    private void shipCrash(){
+        crash_effect.play();
+
+    }
+    private void shipWin(){
+        win_effect.play();
+
+    }
+
     private double getSpeed() {
         return Math.abs(velocity.y)*1000;
+    }
+    public boolean getCrash() {
+        return crashed;
+    }
+    public boolean getLanded() {
+        return landed;
     }
 }

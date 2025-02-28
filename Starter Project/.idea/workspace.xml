@@ -8,7 +8,9 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Game.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Game.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Level.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Level.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Menu.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Ship.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Ship.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/StarterProject.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/StarterProject.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,13 +41,13 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "Application.Driver - Windows/Linux.executor": "Run",
+    "Application.Driver - Windows/Linux.executor": "Debug",
     "Application.Driver.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/logan/OneDrive/Desktop/Game/Lunar-Lander/Starter Project",
+    "last_opened_file_path": "C:/Users/logan/OneDrive/Desktop/Game_Dev/Lunar-Lander/Starter Project/resources/audio",
     "project.structure.last.edited": "Libraries",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2",
@@ -54,10 +56,13 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\logan\OneDrive\Desktop\Game_Dev\Lunar-Lander\Starter Project\resources\audio" />
+      <recent name="C:\Users\logan\OneDrive\Desktop\Game_Dev\Lunar-Lander\Starter Project\resources\sounds" />
       <recent name="C:\Users\logan\OneDrive\Desktop\Game_Dev\Lunar-Lander\Starter Project\resources\images" />
       <recent name="C:\Users\logan\OneDrive\Desktop\Game_Dev\Lunar-Lander\Starter Project\resources" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\logan\OneDrive\Desktop\Game_Dev\Lunar-Lander\Starter Project\resources\audio" />
       <recent name="C:\Users\logan\OneDrive\Desktop\Game\Lunar-Lander\Starter Project\resources\images" />
       <recent name="C:\Users\logan\OneDrive\Desktop\Game_Dev\Lunar-Lander\Starter Project\resources\images" />
     </key>

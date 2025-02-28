@@ -1,3 +1,5 @@
+import edu.usu.audio.Sound;
+import edu.usu.audio.SoundManager;
 import edu.usu.graphics.*;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -10,13 +12,15 @@ public class Game {
 
     private final Graphics2D graphics;
     private Ship player_ship;
-
+    private double gameStartTime = -1;
+    private final double transitionDelay = 3.0;
     private enum gameStates{
         menu,
         game,
         scores,
         options,
         credits,
+        transition,
         pause,
     };
 
@@ -41,21 +45,29 @@ public class Game {
 
     private Texture background;
 
+    private SoundManager audio;
+    private Sound level_music;
+    private Sound countdown_sound;
 
     public Game(Graphics2D graphics) {
         this.graphics = graphics;
     }
 
     public void initialize() {
-        player_ship = new Ship();
         current_state = gameStates.menu;
 
-        menu = new Menu();
+        audio = new SoundManager();
+
+        level_music = audio.load("level_music", "resources/audio/Outer Space - Super Paper Mario.ogg", false);
+        countdown_sound = audio.load("countdown", "resources/audio/countdown-sound-effect.ogg", false);
+        level_music.setGain(.1f);
+        player_ship = new Ship(audio);
+        menu = new Menu(audio);
+
         input = new KeyboardInput();
         menu_input = new KeyboardInput();
         pause = false;
-
-        level = new Level();
+        level = new Level(2);
 
         font = new Font("Arial", java.awt.Font.PLAIN, 84, false);
 
@@ -68,11 +80,7 @@ public class Game {
         //max size is 60
         //needs to be size 64 with font height of .07
         sub_font = new Font("resources/fonts/dedicool/Dedicool.ttf", 64, true);
-        input.registerCommand(GLFW_KEY_SPACE,false,(double elapsedTime) -> {
-            System.out.println("UP KEY PRESSED");
-            player_ship = new Ship();
-            level = new Level();
-        });
+
         input.registerCommand(GLFW_KEY_LEFT,false,(double elapsedTime) -> {
             player_ship.rotateLeft();
 
@@ -88,6 +96,11 @@ public class Game {
         });
         input.registerCommand(GLFW_KEY_ESCAPE,true,(double elapsedTime) -> {
             pause = !pause;
+            if(pause){
+                level_music.pause();
+            } else{
+                level_music.play();
+            }
 
         });
 
@@ -161,7 +174,16 @@ public class Game {
                 String change_to = menu.getHovering();
                 switch(change_to){
                     case ("Start Game"):
-                        current_state = gameStates.game;
+
+                        if (gameStartTime == -1) { // Start timer only if it hasn't started
+                            gameStartTime = glfwGetTime();
+                            countdown_sound.play();
+                        }
+
+                        current_state = gameStates.transition;
+
+                        //level_music.play();
+
 
                     break;
                     case ("View High Scores"):
@@ -189,6 +211,35 @@ public class Game {
 
     private void update(double elapsedTime) {
 
+        if (gameStartTime != -1) { // Check if timer has started
+            double currentTime = glfwGetTime();
+            if (currentTime - gameStartTime >= transitionDelay) {
+
+                switch (current_state){
+                    case transition:
+                            current_state = gameStates.game;
+                            level_music.play();
+                            player_ship = new Ship(audio);
+                            level = new Level(2);
+                            break;
+
+                        case game:
+                            if(player_ship.getCrash()){
+                                current_state = gameStates.menu;
+                            }
+                            else{
+                                current_state = gameStates.transition;
+
+                            }
+
+
+
+                }
+
+                gameStartTime = -1; // Reset timer
+            }
+        }
+
         switch (current_state) {
             case menu:
                 // Code to execute if expression equals value1
@@ -198,7 +249,8 @@ public class Game {
 
                 //If paused hold on updating
                 if(!pause){
-                    player_ship.updateShip(elapsedTime);
+
+                    player_ship.updateShip(elapsedTime,level_music);
 
                     double[] terrain = level.getTerrain();
                     double width = level.getWidth();
@@ -215,10 +267,23 @@ public class Game {
                         boolean safespace = y1 == y2;
 
                         player_ship.checkCollisions(point_1,point_2,.015f,safespace);
+
                     }
 
                 }
 
+
+                if (player_ship.getCrash()){
+
+                    if (gameStartTime == -1) { // Check if timer has started
+                        gameStartTime = glfwGetTime();
+                        System.out.println("HELLO TIMER STARTED");
+                    }
+                }
+                else if(player_ship.getLanded()){
+
+
+                }
 
                 break;
             case options:
@@ -288,9 +353,10 @@ public class Game {
                 level.render_level(graphics);
                 player_ship.renderShip(graphics);
                 player_ship.renderShipHUD(graphics,sub_font);
-                // Code to execute if expression equals value2
 
-
+                break;
+            case transition:
+                graphics.drawTextByHeight(sub_font, "Starting in : "+String.format("%.2f",transitionDelay - (glfwGetTime() - gameStartTime)), title_position_x, title_position_y, title_textHeight, Color.WHITE);
                 break;
             case options:
                 graphics.drawTextByHeight(title_font, "OPTIONS", position_x, position_y, title_textHeight, Color.WHITE);

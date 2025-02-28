@@ -12,11 +12,13 @@ public class Level {
     private static final double INITIAL_ROUGHNESS = .6; // Adjust for more or less jaggedness
     private double[] terrain = new double[NUM_POINTS]; // Store heights
     private double[] safe_zones = new double[NUM_POINTS];
+    private int safe_spaces;
 
-    public Level() {
+    public Level(int safe_spaces) {
 
         generateTerrain();
         addLandingZones();
+        this.safe_spaces = safe_spaces;
 
     }
 
@@ -45,7 +47,7 @@ public class Level {
         double range = Math.abs(right - left) / (double) NUM_POINTS;
         double r = roughness * gaussianRandom(random) * range;
 
-        terrain[mid] = Math.max(-0.3f, Math.min(0.5f, avg + r));
+        terrain[mid] = Math.max(-0.1f, Math.min(0.5f, avg + r));
 
 
         // Reduce roughness dynamically for smoother transitions
@@ -89,7 +91,9 @@ public class Level {
     }
     private void addLandingZones() {
         int numZones = 2; // Number of flat landing zones
+
         int zoneWidth = NUM_POINTS / 8;
+
 
         double lowerBound = 0 + 0.15 * (NUM_POINTS);
     // Width of each zone
