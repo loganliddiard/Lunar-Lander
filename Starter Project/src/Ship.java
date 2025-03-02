@@ -34,7 +34,7 @@ public class Ship {
     private Sound crash_effect;
     private Sound win_effect;
     private Sound thrust_effect;
-
+    private final float base_thrust;
     private boolean finished;
     public Ship(SoundManager audio){
 
@@ -45,69 +45,60 @@ public class Ship {
 
         finished = false;
 
-        turn_angle = 0.75f;
+        turn_angle = 120f;
         angle = 0f;
         status = fuel_status.full;
-        fuel_usage = .05f;
-        max_fuel = 100.0;
+
+        max_fuel = 20.0;
         x = -0.0f;
         y = -0.40f;
         velocity = new Vector2f(0.0f, 0.0f);
-        fuel = 100;
+        fuel = 20.0;
 
         lengths = -.03f;
         position = new Vector2f(x, y);
         offset = new Vector2f(x-(lengths/2), y+(lengths/2));
         galaga = new Texture("resources/images/RedGalaga.png");
-        gravity = 0.000025f;
+        gravity = 	0.000002f;
+        base_thrust = .0006f;
     }
 
-    public void thrust() {
+    public void thrust(double elapsedTime) {
         if (fuel > 0 && !crashed && !landed) {
-            fuel -= 0.1; // Consume some fuel
+            fuel -=  elapsedTime; // Scale fuel consumption
 
-            //account for going under or rolling back to highest value;
-            if(fuel<= 0 || fuel > max_fuel+1){
+            if (fuel <= 0 || fuel > max_fuel + 1) {
                 fuel = 0;
             }
 
-            if(!thrust_effect.isPlaying()){
-
+            if (!thrust_effect.isPlaying()) {
                 thrust_effect.play();
             }
 
-
-
             double radians = Math.toRadians(angle);
-
-            float thrustPower = 0.00007f; // Adjust thrust power for balance
+            float thrustPower = base_thrust * (float) elapsedTime; // Scale thrust by elapsed time
 
             // Update velocity based on ship's direction
             velocity.x += (float) Math.cos(radians) * thrustPower;
             velocity.y += (float) Math.sin(radians) * thrustPower;
         }
     }
-
-    public void rotateRight(){
-
-        if (fuel > 0 && !crashed && !landed){
-            fuel -= fuel_usage;
-            angle += turn_angle;
-            if (angle > 360){
-
+    public void rotateRight(double elapsedTime) {
+        if (fuel > 0 && !crashed && !landed) {
+            fuel -= elapsedTime;
+            angle += turn_angle * elapsedTime; // Adjust rotation based on elapsed time
+            if (angle > 360) {
                 angle = angle % 360;
             }
         }
     }
-    public void rotateLeft(){
-        if (fuel > 0 && !crashed && !landed){
-            fuel -= fuel_usage;
-            angle -= turn_angle;
-            if (angle < 0){
-
+    public void rotateLeft(double elapsedTime) {
+        if (fuel > 0 && !crashed && !landed) {
+            fuel -= elapsedTime;
+            angle -= turn_angle * elapsedTime; // Adjust rotation based on elapsed time
+            if (angle < 0) {
                 angle += 360;
             }
-
         }
     }
 
@@ -264,7 +255,7 @@ public class Ship {
     }
 
     private double getSpeed() {
-        return Math.abs(velocity.y)*1000;
+        return Math.abs(velocity.y)*4000;
     }
     public boolean getCrash() {
         return crashed;

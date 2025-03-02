@@ -67,7 +67,7 @@ public class Game {
         input = new KeyboardInput();
         menu_input = new KeyboardInput();
         pause = false;
-        level = new Level(2);
+        level = new Level();
 
         font = new Font("Arial", java.awt.Font.PLAIN, 84, false);
 
@@ -82,16 +82,15 @@ public class Game {
         sub_font = new Font("resources/fonts/dedicool/Dedicool.ttf", 64, true);
 
         input.registerCommand(GLFW_KEY_LEFT,false,(double elapsedTime) -> {
-            player_ship.rotateLeft();
+            player_ship.rotateLeft(elapsedTime);
 
         });
         input.registerCommand(GLFW_KEY_RIGHT,false,(double elapsedTime) -> {
-            player_ship.rotateRight();
-
+            player_ship.rotateRight(elapsedTime);
 
         });
         input.registerCommand(GLFW_KEY_UP,false,(double elapsedTime) -> {
-            player_ship.thrust();
+            player_ship.thrust(elapsedTime);
 
         });
         input.registerCommand(GLFW_KEY_ESCAPE,true,(double elapsedTime) -> {
@@ -101,6 +100,10 @@ public class Game {
             } else{
                 level_music.play();
             }
+
+        });
+        input.registerCommand(GLFW_KEY_SPACE,true,(double elapsedTime) -> {
+            level = new Level();
 
         });
 
@@ -161,7 +164,7 @@ public class Game {
         glfwPollEvents();
 
         input.update(elapsedTime,graphics);
-        if (current_state != gameStates.game){
+        if (current_state != gameStates.game && current_state != gameStates.transition){
             menu_input.update(elapsedTime,graphics);
 
         } else{
@@ -174,16 +177,8 @@ public class Game {
                 String change_to = menu.getHovering();
                 switch(change_to){
                     case ("Start Game"):
-
-                        if (gameStartTime == -1) { // Start timer only if it hasn't started
-                            gameStartTime = glfwGetTime();
-                            countdown_sound.play();
-                        }
-
+                        level = new Level();
                         current_state = gameStates.transition;
-
-                        //level_music.play();
-
 
                     break;
                     case ("View High Scores"):
@@ -218,22 +213,32 @@ public class Game {
                 switch (current_state){
                     case transition:
                             current_state = gameStates.game;
-                            level_music.play();
+                            if(!level_music.isPlaying()){level_music.play();}
                             player_ship = new Ship(audio);
-                            level = new Level(2);
+
                             break;
 
                         case game:
                             if(player_ship.getCrash()){
                                 current_state = gameStates.menu;
+
                             }
                             else{
-                                current_state = gameStates.transition;
+                                if(player_ship.getLanded()){
+                                    if(level.getSafe_spaces() <= 1){
 
+                                        if(level_music.isPlaying()){level_music.stop();}
+                                        //get scores write them to high scores if negetSafe_spacescassary
+                                        current_state = gameStates.menu;
+                                    } else{
+
+                                        level.regenerate();
+                                        current_state = gameStates.transition;
+                                        break;
+                                    }
+
+                                }
                             }
-
-
-
                 }
 
                 gameStartTime = -1; // Reset timer
@@ -253,6 +258,7 @@ public class Game {
                     player_ship.updateShip(elapsedTime,level_music);
 
                     double[] terrain = level.getTerrain();
+                    double[] safe_spaces = level.getSafe_zones();
                     double width = level.getWidth();
                     float offset = level.getOffset();
 
@@ -264,7 +270,7 @@ public class Game {
                         Vector2f point_1 = new Vector2f(x1,y1) ;
                         Vector2f point_2 = new Vector2f(x2,y2);
 
-                        boolean safespace = y1 == y2;
+                        boolean safespace = 1 == safe_spaces[i] && 1 == safe_spaces[i + 1];
 
                         player_ship.checkCollisions(point_1,point_2,.015f,safespace);
 
@@ -273,18 +279,20 @@ public class Game {
                 }
 
 
-                if (player_ship.getCrash()){
+                if (player_ship.getCrash() || player_ship.getLanded()){
 
                     if (gameStartTime == -1) { // Check if timer has started
                         gameStartTime = glfwGetTime();
-                        System.out.println("HELLO TIMER STARTED");
+
                     }
                 }
-                else if(player_ship.getLanded()){
 
-
+                break;
+            case transition:
+                if (gameStartTime == -1) { // Start timer only if it hasn't started
+                    gameStartTime = glfwGetTime();
+                    countdown_sound.play();
                 }
-
                 break;
             case options:
                 // Code to execute if expression equals value3
