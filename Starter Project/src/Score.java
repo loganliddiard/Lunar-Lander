@@ -1,12 +1,12 @@
 import java.util.Date;
 
-public class Scores {
+public class Score {
 
-    public Scores() {
+    public Score() {
         initialized = false;
     }
 
-    public Scores(int score) {
+    public Score(int score) {
         this.score = score;
         this.timeStamp = new Date();
         this.initialized = true;

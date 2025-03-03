@@ -94,7 +94,7 @@ public class Level {
             graphics.draw(triangle, Color.WHITE);
 
             if (i != safe_zones.length - 1) {
-                if (safe_zones[i] == 0 && safe_zones[i + 1] == 1) {
+                if (safe_zones[i] == 0 && safe_zones[i + 1] == 1 || safe_zones[i] == 0 && safe_zones[i + 1] == 2) {
                     graphics.draw(start, end, Color.GREEN);
 
                     // Calculate flag position (midpoint of safe zone)
@@ -151,7 +151,7 @@ public class Level {
             int start = random.nextInt(NUM_POINTS - zoneWidth - 1);
             for (int j = 0; j < zoneWidth; j++) {
                 terrain[start + j] = terrain[start]; // Flatten segment
-                safe_zones[start + j] = 1;
+                safe_zones[start + j] = i+1;
 
 
             }

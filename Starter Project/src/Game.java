@@ -4,6 +4,7 @@ import edu.usu.graphics.*;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
+import java.util.List;
 import java.util.Objects;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -49,7 +50,8 @@ public class Game {
     private SoundManager audio;
     private Sound level_music;
     private Sound countdown_sound;
-    private Scores scores;
+    private HighScores highScores;
+    private int score;
     public Game(Graphics2D graphics) {
         this.graphics = graphics;
     }
@@ -57,20 +59,21 @@ public class Game {
     public void initialize() {
 
 
-
+        highScores = new HighScores();
+        serializer = new Serializer();
+        serializer.loadHighScores(highScores);
 
         current_state = gameStates.menu;
-        serializer = new Serializer();
 
-        this.scores = new Scores();
-        this.serializer.loadScores(this.scores);
+
+
 
 
         audio = new SoundManager();
 
         level_music = audio.load("level_music", "resources/audio/Outer Space - Super Paper Mario.ogg", false);
         countdown_sound = audio.load("countdown", "resources/audio/countdown-sound-effect.ogg", false);
-        level_music.setGain(.1f);
+        level_music.setGain(.0f);
         player_ship = new Ship(audio);
         menu = new Menu(audio);
 
@@ -140,6 +143,7 @@ public class Game {
 
         menu_input.registerCommand(GLFW_KEY_ESCAPE,true,(double elapsedTime) -> {
             if (current_state == gameStates.menu){
+                serializer.shutdown();
                 glfwSetWindowShouldClose(graphics.getWindow(), true);
             } else if (current_state == gameStates.game){
                 //pause = !pause;
@@ -188,12 +192,13 @@ public class Game {
                 switch(change_to){
                     case ("Start Game"):
                         level = new Level();
+                        score = 0;
                         current_state = gameStates.transition;
 
                     break;
                     case ("View High Scores"):
-                        this.scores = new Scores();
-                        this.serializer.loadScores(this.scores);
+
+                        serializer.loadHighScores(highScores);
                         current_state = gameStates.scores;
 
                         break;
@@ -237,11 +242,15 @@ public class Game {
                             }
                             else{
                                 if(player_ship.getLanded()){
+
+                                    score += player_ship.getScore();
+
                                     if(level.getSafe_spaces() <= 1){
 
                                         if(level_music.isPlaying()){level_music.stop();}
-                                        //
-                                        this.serializer.saveGameState(new Scores(100));
+
+                                        highScores.addScore(new Score(score));
+                                        serializer.saveHighScores(highScores);
 
                                         current_state = gameStates.menu;
                                     } else{
@@ -284,9 +293,9 @@ public class Game {
                         Vector2f point_1 = new Vector2f(x1,y1) ;
                         Vector2f point_2 = new Vector2f(x2,y2);
 
-                        boolean safespace = 1 == safe_spaces[i] && 1 == safe_spaces[i + 1];
+                        boolean safespace = 0 != safe_spaces[i] && 0 != safe_spaces[i + 1];
 
-                        player_ship.checkCollisions(point_1,point_2,.015f,safespace);
+                        player_ship.checkCollisions(point_1,point_2,.015f,safespace,(int) safe_spaces[i]);
 
                     }
 
@@ -381,21 +390,27 @@ public class Game {
                 graphics.drawTextByHeight(sub_font, "Starting in : "+String.format("%.2f",transitionDelay - (glfwGetTime() - gameStartTime)), title_position_x, title_position_y, title_textHeight, Color.WHITE);
                 break;
             case options:
-                graphics.drawTextByHeight(title_font, "OPTIONS", position_x, position_y, title_textHeight, Color.WHITE);
+                graphics.drawTextByHeight(title_font, "OPTIONS", title_position_x, title_position_y, title_textHeight, Color.WHITE);
 
                 break;
             case scores:
-                graphics.drawTextByHeight(title_font, "SCORES", position_x, position_y, title_textHeight, Color.WHITE);
-                if(this.scores != null && this.scores.initialized){
-                    graphics.drawTextByHeight(title_font, String.valueOf(scores.score), position_x, position_y+textHeight, title_textHeight, Color.WHITE);
-                } else graphics.drawTextByHeight(title_font, "No scores recorded...", position_x, position_y+textHeight, title_textHeight, Color.WHITE);
+                graphics.drawTextByHeight(title_font, "SCORES", title_position_x, title_position_y, title_textHeight, Color.WHITE);
+                if(this.highScores != null && this.highScores.initialized){
+
+                    int temp = 0;
+                    for(Score score : this.highScores.getScores()){
+                        graphics.drawTextByHeight(sub_font, "Rank "+(temp+1)+" - "+score.score, position_x, position_y+(textHeight*(temp+1)), title_textHeight, Color.WHITE);
+                        temp +=1;
+                    }
+
+                } else graphics.drawTextByHeight(sub_font, "No scores recorded...", position_x, position_y+textHeight, title_textHeight, Color.WHITE);
 
 
                 // Code to execute if expression equals value2
                 break;
             // ... more cases
             case credits:
-                graphics.drawTextByHeight(title_font, "CREDITS", position_x, position_y, title_textHeight, Color.WHITE);
+                graphics.drawTextByHeight(title_font, "CREDITS", title_position_x, title_position_y, title_textHeight, Color.WHITE);
                 break;
         }
 

@@ -6,8 +6,13 @@
   <component name="ChangeListManager">
     <list default="true" id="8858ee06-ea5c-4baa-8898-f17b08ca1729" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Lunar-Lander.iml" beforeDir="false" afterPath="$PROJECT_DIR$/Lunar-Lander.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scores.json" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Game.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Game.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/HighScores.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/HighScores.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Level.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Level.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Scores.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Score.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Serializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Serializer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Ship.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Ship.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,7 +51,7 @@
     "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/logan/OneDrive/Desktop/Game_Dev/Lunar-Lander/Starter Project/lwjgl-lib",
+    "last_opened_file_path": "C:/Users/logan/OneDrive/Desktop/Game_Dev/DEMO/Serialization",
     "project.structure.last.edited": "Libraries",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2",
@@ -113,6 +118,19 @@
     <servers />
   </component>
   <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-method">
+          <url>file://$PROJECT_DIR$/src/Ship.java</url>
+          <line>319</line>
+          <properties class="Ship" method="getScore">
+            <option name="EMULATED" value="true" />
+            <option name="WATCH_EXIT" value="false" />
+          </properties>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
         <watch expression="allChars.length()" language="JAVA" />

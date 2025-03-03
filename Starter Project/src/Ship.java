@@ -5,6 +5,8 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.w3c.dom.Text;
 
+import javax.swing.*;
+
 public class Ship {
     private double angle;
     private Vector2f velocity;
@@ -20,13 +22,15 @@ public class Ship {
     private float gravity;
     private float fuel_usage;
     private float lengths;
-
+    private int perfect_angle = 0;
+    private int perfect_speed = 0;
     private double max_fuel;
     private enum fuel_status{
         full,
         medium,
         low
     }
+    private int score = 0;
     private fuel_status status;
     private boolean landed;
     private boolean crashed;
@@ -37,6 +41,7 @@ public class Ship {
     private final float base_thrust;
     private boolean finished;
     private ParticleSystem particleSystem;
+    private int landed_value;
     public Ship(SoundManager audio){
 
 
@@ -143,9 +148,6 @@ public class Ship {
         float start_y = -.45f;
         float textHeight = .05f;
 
-        graphics.drawTextByHeight(font,show_fuel,start_x,start_y,textHeight,Color.WHITE);
-        graphics.drawTextByHeight(font,show_angle,start_x,start_y+textHeight,textHeight,Color.WHITE);
-
         switch (status){
 
             case full:
@@ -158,11 +160,21 @@ public class Ship {
                 graphics.drawTextByHeight(font,show_fuel,start_x,start_y,textHeight,Color.RED);
                 break;
         }
+        if(getSpeed() <= 2){
+            graphics.drawTextByHeight(font,show_speed,start_x,start_y+textHeight,textHeight,Color.GREEN);
+        }
+        else{
+            graphics.drawTextByHeight(font,show_speed,start_x,start_y+textHeight,textHeight,Color.WHITE);
+        }
+        if(checkAngle()){
+            graphics.drawTextByHeight(font,show_angle,start_x,start_y+textHeight+textHeight,textHeight,Color.GREEN);
+        } else{
+            graphics.drawTextByHeight(font,show_angle,start_x,start_y+textHeight+textHeight,textHeight,Color.WHITE);
+        }
 
-        graphics.drawTextByHeight(font,show_speed,start_x,start_y+textHeight+textHeight,textHeight,Color.WHITE);
-        graphics.drawTextByHeight(font,show_speed,start_x,start_y+textHeight+textHeight,textHeight,Color.WHITE);
         if(crashed) graphics.drawTextByHeight(font,"CRASHED",start_x,start_y+textHeight+textHeight+textHeight,textHeight,Color.RED);
-        if(landed) graphics.drawTextByHeight(font,"LANDED",start_x,start_y+textHeight+textHeight+textHeight+textHeight,textHeight,Color.GREEN);
+        if(landed && !crashed) graphics.drawTextByHeight(font,"LANDED",start_x,start_y+textHeight+textHeight+textHeight+textHeight,textHeight,Color.GREEN);
+        if(score != 0) graphics.drawTextByHeight(font,"POINTS - "+score,start_x,start_y+textHeight+textHeight+textHeight+textHeight+textHeight,textHeight,Color.YELLOW);
     }
 
 
@@ -200,7 +212,7 @@ public class Ship {
         }
     }
 
-    public boolean checkCollisions(Vector2f pt1, Vector2f pt2, float circleRadius,boolean isSafeSpace) {
+    public boolean checkCollisions(Vector2f pt1, Vector2f pt2, float circleRadius,boolean isSafeSpace,int value) {
         // Translate points to circle's coordinate system
         Vector2f d = new Vector2f(pt2).sub(pt1);
         Vector2f f = new Vector2f(pt1).sub(new Vector2f(position.x + (lengths / 2), position.y + (lengths / 2)));
@@ -228,6 +240,7 @@ public class Ship {
 
                 if(checkAngle() && getSpeed() < 2){
                     landed = true;
+                    landed_value = value;
                 } else crashed = true;
 
             }
@@ -254,9 +267,17 @@ public class Ship {
         double tempangle = (angle+ 90) % 360;
 
         if( tempangle >=355 && tempangle <=360){
+            if (tempangle == 360){
+                perfect_angle = 1;
+            } else perfect_angle = 0;
             return true;
         }
         if (tempangle >=0 && tempangle <=5){
+
+            if (tempangle == 0){
+                perfect_angle = 1;
+            } else perfect_angle = 0;
+
             return true;
         }
 
@@ -271,10 +292,23 @@ public class Ship {
     }
     private void shipWin(){
         win_effect.play();
+        score += fuel * 5;
+        score +=  500 * landed_value;
+        score += perfect_speed * 500;
+        score += perfect_angle * 500;
 
     }
 
     private double getSpeed() {
+        double speed = Math.abs(velocity.y)*4000;
+
+        if (speed < .2){
+            perfect_speed = 1;
+        }
+        else {
+            perfect_speed = 0;
+        }
+
         return Math.abs(velocity.y)*4000;
     }
     public boolean getCrash() {
@@ -282,5 +316,9 @@ public class Ship {
     }
     public boolean getLanded() {
         return landed;
+    }
+    public int getScore(){
+
+        return score;
     }
 }

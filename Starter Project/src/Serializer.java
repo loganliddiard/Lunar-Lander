@@ -18,9 +18,10 @@ public class Serializer implements Runnable {
     private final Condition doSomething = lockSignal.newCondition();
     private Activity doThis = Activity.Nothing;
 
-    private Scores gameState;
+    private HighScores highScores;
 
     private final Thread tInternal;
+    private static final String FILE_NAME = "highscores.json";
 
     public Serializer() {
         this.tInternal = new Thread(this);
@@ -38,9 +39,9 @@ public class Serializer implements Runnable {
 
                 // Based on what was requested, do something
                 switch (doThis) {
-                    case Activity.Nothing -> {}
-                    case Activity.Save -> saveSomething();
-                    case Activity.Load -> loadSomething();
+                    case Nothing -> {}
+                    case Save -> saveSomething();
+                    case Load -> loadSomething();
                 }
             }
         } catch (Exception ex) {
@@ -48,27 +49,22 @@ public class Serializer implements Runnable {
         }
     }
 
-    /// Public method used by client code to request the game state is saved
-    /// NOTE: This does not prevent against race conditions if the gameState object
-    ///       is modified while the saving is taking place.  A production level
-    ///       approach would have an event held by the client signaled when
-    ///       the saving is complete.
-    public void saveGameState(Scores state) {
+    /// Public method used by client code to request the high scores be saved
+    public void saveHighScores(HighScores scores) {
         lockSignal.lock();
 
-        this.gameState = state;
+        this.highScores = scores;
         doThis = Activity.Save;
         doSomething.signal();
 
         lockSignal.unlock();
     }
 
-    /// Public method used the client code to request the game state is loaded.
-    /// NOTE: Same comment about race conditions as above.
-    public void loadScores(Scores state) {
+    /// Public method used by client code to request high scores be loaded.
+    public void loadHighScores(HighScores scores) {
         lockSignal.lock();
 
-        this.gameState = state;
+        this.highScores = scores;
         doThis = Activity.Load;
         doSomething.signal();
 
@@ -88,34 +84,30 @@ public class Serializer implements Runnable {
 
             tInternal.join();
         } catch (Exception ex) {
-            System.out.printf("Failure to gracefully shutdown thread: %s\n", ex.getMessage());
+            System.out.printf("Failure to gracefully shut down thread: %s\n", ex.getMessage());
         }
     }
 
-    /// This is where the actual serialization of the game state is performed.  Have
-    /// chosen to save in JSON format for readability for the demo, but the state
-    /// could have been stored using a binary serializer for more efficient storage
+    /// This is where the actual serialization of the high scores is performed.
     private synchronized void saveSomething() {
-        System.out.println("saving something...");
-        try (FileWriter writer = new FileWriter("scores.json")) {
+        System.out.println("Saving high scores...");
+        try (FileWriter writer = new FileWriter(FILE_NAME)) {
             Gson gson = new Gson();
-            gson.toJson(this.gameState, writer);
+            gson.toJson(this.highScores, writer);
         } catch (Exception ex) {
-            System.out.println(ex.getMessage());
+            System.out.println("Error saving high scores: " + ex.getMessage());
         }
     }
 
-    /// This is where the actual deserialization of the game state is performed.
-    /// Same note as above regarding the choice to use JSON formatting.
+    /// This is where the actual deserialization of the high scores is performed.
     private synchronized void loadSomething() {
-        System.out.println("loading something...");
-        try (FileReader reader = new FileReader("scores.json")) {
-            Scores state = (new Gson()).fromJson(reader, Scores.class);
-            this.gameState.score = state.score;
-            this.gameState.timeStamp = state.timeStamp;
-            this.gameState.initialized = true;
+        System.out.println("Loading high scores...");
+        try (FileReader reader = new FileReader(FILE_NAME)) {
+            HighScores loadedScores = (new Gson()).fromJson(reader, HighScores.class);
+            this.highScores.scores = loadedScores.scores;
+            this.highScores.initialized = true;
         } catch (Exception ex) {
-            System.out.println(ex.getMessage());
+            System.out.println("Error loading high scores: " + ex.getMessage());
         }
     }
 }
