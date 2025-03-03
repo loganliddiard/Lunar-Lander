@@ -34,6 +34,7 @@ public class Game {
     private gameStates current_state;
     private Menu menu;
 
+    private Serializer serializer;
     private boolean pause;
 
     //Draw boarder
@@ -48,13 +49,22 @@ public class Game {
     private SoundManager audio;
     private Sound level_music;
     private Sound countdown_sound;
-
+    private Scores scores;
     public Game(Graphics2D graphics) {
         this.graphics = graphics;
     }
 
     public void initialize() {
+
+
+
+
         current_state = gameStates.menu;
+        serializer = new Serializer();
+
+        this.scores = new Scores();
+        this.serializer.loadScores(this.scores);
+
 
         audio = new SoundManager();
 
@@ -182,6 +192,8 @@ public class Game {
 
                     break;
                     case ("View High Scores"):
+                        this.scores = new Scores();
+                        this.serializer.loadScores(this.scores);
                         current_state = gameStates.scores;
 
                         break;
@@ -228,7 +240,9 @@ public class Game {
                                     if(level.getSafe_spaces() <= 1){
 
                                         if(level_music.isPlaying()){level_music.stop();}
-                                        //get scores write them to high scores if negetSafe_spacescassary
+                                        //
+                                        this.serializer.saveGameState(new Scores(100));
+
                                         current_state = gameStates.menu;
                                     } else{
 
@@ -368,10 +382,14 @@ public class Game {
                 break;
             case options:
                 graphics.drawTextByHeight(title_font, "OPTIONS", position_x, position_y, title_textHeight, Color.WHITE);
-                // Code to execute if expression equals value2
+
                 break;
             case scores:
                 graphics.drawTextByHeight(title_font, "SCORES", position_x, position_y, title_textHeight, Color.WHITE);
+                if(this.scores != null && this.scores.initialized){
+                    graphics.drawTextByHeight(title_font, String.valueOf(scores.score), position_x, position_y+textHeight, title_textHeight, Color.WHITE);
+                } else graphics.drawTextByHeight(title_font, "No scores recorded...", position_x, position_y+textHeight, title_textHeight, Color.WHITE);
+
 
                 // Code to execute if expression equals value2
                 break;

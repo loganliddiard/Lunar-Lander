@@ -6,9 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="8858ee06-ea5c-4baa-8898-f17b08ca1729" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Particle.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Particle.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ParticleSystem.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ParticleSystem.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Ship.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Ship.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Lunar-Lander.iml" beforeDir="false" afterPath="$PROJECT_DIR$/Lunar-Lander.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Game.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Game.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,11 +40,13 @@
   "keyToString": {
     "Application.Driver - Windows/Linux.executor": "Run",
     "Application.Driver.executor": "Run",
+    "JAR Application.gson-2.10.1.jar.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/logan/OneDrive/Desktop/Game_Dev/Lunar-Lander/Starter Project/resources/audio",
+    "last_opened_file_path": "C:/Users/logan/OneDrive/Desktop/Game_Dev/Lunar-Lander/Starter Project/lwjgl-lib",
     "project.structure.last.edited": "Libraries",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2",
@@ -54,12 +55,14 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\logan\OneDrive\Desktop\Game_Dev\Lunar-Lander\Starter Project\lwjgl-lib" />
+      <recent name="C:\Users\logan\OneDrive\Desktop\Game_Dev\Lunar-Lander\Starter Project" />
       <recent name="C:\Users\logan\OneDrive\Desktop\Game_Dev\Lunar-Lander\Starter Project\resources\audio" />
       <recent name="C:\Users\logan\OneDrive\Desktop\Game_Dev\Lunar-Lander\Starter Project\resources\sounds" />
       <recent name="C:\Users\logan\OneDrive\Desktop\Game_Dev\Lunar-Lander\Starter Project\resources\images" />
-      <recent name="C:\Users\logan\OneDrive\Desktop\Game_Dev\Lunar-Lander\Starter Project\resources" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\logan\OneDrive\Desktop\Game_Dev\Lunar-Lander\Starter Project" />
       <recent name="C:\Users\logan\OneDrive\Desktop\Game_Dev\Lunar-Lander\Starter Project\resources\audio" />
       <recent name="C:\Users\logan\OneDrive\Desktop\Game\Lunar-Lander\Starter Project\resources\images" />
       <recent name="C:\Users\logan\OneDrive\Desktop\Game_Dev\Lunar-Lander\Starter Project\resources\images" />
@@ -83,10 +86,20 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="gson-2.10.1.jar" type="JarApplication" temporary="true">
+      <option name="JAR_PATH" value="$PROJECT_DIR$/google/gson-2.10.1.jar" />
+      <method v="2" />
+    </configuration>
     <list>
       <item itemvalue="Application.Driver - Windows/Linux" />
       <item itemvalue="Application.Driver - macOS" />
+      <item itemvalue="JAR Application.gson-2.10.1.jar" />
     </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JAR Application.gson-2.10.1.jar" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -100,15 +113,6 @@
     <servers />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/Game.java</url>
-          <line>225</line>
-          <option name="timeStamp" value="2" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
         <watch expression="allChars.length()" language="JAVA" />
