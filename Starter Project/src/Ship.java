@@ -89,8 +89,11 @@ public class Ship {
 
             // Generate thrust particles
             Vector2f center = new Vector2f(position.x + (lengths / 2), position.y + (lengths / 2));
-            Vector2f exhaustPosition = new Vector2f(center).sub(new Vector2f((float) Math.cos(radians) * 0.02f, (float) Math.sin(radians) * 0.02f));
-            particleSystem.generateParticles(exhaustPosition, 5, new Vector2f(velocity.x+0.02f, velocity.y+0.02f), 1.0f);
+
+            Vector2f exhaustPosition = new Vector2f(center).sub(new Vector2f((float) Math.cos(radians) * 0.015f, (float) Math.sin(radians) * 0.015f));
+
+
+            particleSystem.generateThrusterParticles(exhaustPosition, 5, 0.15f, 1.0f, radians);
         }
     }
     public void rotateRight(double elapsedTime) {
