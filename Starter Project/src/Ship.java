@@ -36,6 +36,7 @@ public class Ship {
     private Sound thrust_effect;
     private final float base_thrust;
     private boolean finished;
+    private ParticleSystem particleSystem;
     public Ship(SoundManager audio){
 
 
@@ -61,6 +62,10 @@ public class Ship {
         galaga = new Texture("resources/images/RedGalaga.png");
         gravity = 	0.000002f;
         base_thrust = .0006f;
+
+
+        particleSystem = new ParticleSystem();
+
     }
 
     public void thrust(double elapsedTime) {
@@ -81,6 +86,11 @@ public class Ship {
             // Update velocity based on ship's direction
             velocity.x += (float) Math.cos(radians) * thrustPower;
             velocity.y += (float) Math.sin(radians) * thrustPower;
+
+            // Generate thrust particles
+            Vector2f center = new Vector2f(position.x + (lengths / 2), position.y + (lengths / 2));
+            Vector2f exhaustPosition = new Vector2f(center).sub(new Vector2f((float) Math.cos(radians) * 0.02f, (float) Math.sin(radians) * 0.02f));
+            particleSystem.generateParticles(exhaustPosition, 5, new Vector2f(velocity.x+0.02f, velocity.y+0.02f), 1.0f);
         }
     }
     public void rotateRight(double elapsedTime) {
@@ -103,15 +113,19 @@ public class Ship {
     }
 
     public void renderShip(Graphics2D graphics) {
-        ship = new Rectangle(position.x, position.y, lengths, lengths);
-        double radians = Math.toRadians(angle-90);
 
-        // Compute the true center of the ship for rotation
-        Vector2f center = new Vector2f(position.x + (lengths / 2), position.y + (lengths / 2));
+        if(!crashed){
+            ship = new Rectangle(position.x, position.y, lengths, lengths);
+            double radians = Math.toRadians(angle-90);
 
-        // Rotate around the correct center
-        graphics.draw(galaga,ship, (float) radians, center, Color.WHITE);
+            // Compute the true center of the ship for rotation
+            Vector2f center = new Vector2f(position.x + (lengths / 2), position.y + (lengths / 2));
 
+            // Rotate around the correct center
+            graphics.draw(galaga,ship, (float) radians, center, Color.WHITE);
+        }
+        // Render particles
+        particleSystem.render(graphics);
     }
 
     public void renderShipHUD(Graphics2D graphics, Font font) {
@@ -152,6 +166,7 @@ public class Ship {
 
     public void updateShip(double elapsedTime,Sound level_music){
 
+        particleSystem.update((float) elapsedTime);
         if(!crashed && !landed){
 
             if (fuel > max_fuel /2){
@@ -247,6 +262,8 @@ public class Ship {
 
     private void shipCrash(){
         crash_effect.play();
+        Vector2f center = new Vector2f(position.x + (lengths / 2), position.y + (lengths / 2));
+        particleSystem.generateParticles(center, 50, new Vector2f(0.05f, 0.05f), 2.0f);
 
     }
     private void shipWin(){
