@@ -42,8 +42,9 @@ public class Ship {
     private boolean finished;
     private ParticleSystem particleSystem;
     private int landed_value;
-    public Ship(SoundManager audio){
+    public Ship(SoundManager audio, int score){
 
+        this.score = score;
 
         crash_effect = audio.load("crash","resources/audio/retro-explode.ogg",false);
         win_effect = audio.load("win","resources/audio/8-bit-victory.ogg",false);

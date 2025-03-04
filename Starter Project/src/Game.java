@@ -77,7 +77,7 @@ public class Game {
         level_music = audio.load("level_music", "resources/audio/Outer Space - Super Paper Mario.ogg", false);
         countdown_sound = audio.load("countdown", "resources/audio/countdown-sound-effect.ogg", false);
         level_music.setGain(.5f);
-        player_ship = new Ship(audio);
+        player_ship = new Ship(audio,score);
         menu = new Menu(audio);
 
         input = new KeyboardInput();
@@ -118,10 +118,11 @@ public class Game {
             }
 
         });
-        input.registerCommand(GLFW_KEY_SPACE,true,(double elapsedTime) -> {
-            level = new Level();
 
-        });
+        //FOR DEBUGGING TERRAIN GENERATION
+        //input.registerCommand(GLFW_KEY_SPACE,true,(double elapsedTime) -> {
+        //    level = new Level();
+        //});
 
 
         //different game states use different controls
@@ -245,19 +246,24 @@ public class Game {
                     case transition:
                             current_state = gameStates.game;
                             if(!level_music.isPlaying()){level_music.play();}
-                            player_ship = new Ship(audio);
+                            player_ship = new Ship(audio,score);
 
                             break;
 
                         case game:
                             if(player_ship.getCrash()){
                                 current_state = gameStates.menu;
+                                if(player_ship.getScore() > 0){
+                                    highScores.addScore(new Score(score));
+                                    serializer.saveHighScores(highScores);
+                                }
+
 
                             }
                             else{
                                 if(player_ship.getLanded()){
 
-                                    score += player_ship.getScore();
+                                    score = player_ship.getScore();
 
                                     if(level.getSafe_spaces() <= 1){
 
