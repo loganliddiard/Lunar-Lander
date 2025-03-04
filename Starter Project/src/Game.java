@@ -456,7 +456,7 @@ public class Game {
                 // Starting Y position (beginning from the bottom of the screen)
                 float startY = screen_height-(screen_height/2); // Start slightly off-screen
                 float yOffset = startY + scrollOffset; // Apply scroll effect
-
+                textHeight = textHeight -.01f;
                 // Draw title
                 graphics.drawTextByHeight(title_font, "CREDITS", title_position_x, yOffset, textHeight, Color.WHITE);
                 yOffset += textHeight * 2; // Extra space after title
