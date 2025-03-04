@@ -94,7 +94,9 @@ public class Level {
             graphics.draw(triangle, Color.WHITE);
 
             if (i != safe_zones.length - 1) {
-                if (safe_zones[i] == 0 && safe_zones[i + 1] == 1 || safe_zones[i] == 0 && safe_zones[i + 1] == 2) {
+                if (safe_zones[i] == 0 && safe_zones[i + 1] == 1
+                        || safe_zones[i] == 0 && safe_zones[i + 1] == 2
+                        || safe_zones[i] == 1 && safe_zones[i + 1] == 2) {
                     graphics.draw(start, end, Color.GREEN);
 
                     // Calculate flag position (midpoint of safe zone)
@@ -125,39 +127,49 @@ public class Level {
     }
     private void addLandingZones() {
         int numZones = this.safe_spaces; // Number of flat landing zones
+        System.out.println("Landing zones to be spawned: " + numZones);
 
-        System.out.println("Landing zones to be spawned+"+numZones);
-        int zoneWidth = NUM_POINTS / 8;
-        if(numZones != 2){
+        int zoneWidth = (numZones != 2) ? NUM_POINTS / 16 : NUM_POINTS / 8;
 
-            zoneWidth = NUM_POINTS / 16;
-        }
-
-
-
-        double lowerBound = 0 + 0.15 * (NUM_POINTS);
-    // Width of each zone
+        double lowerBound = 0.15 * NUM_POINTS;  // Ensure zones don't spawn too close to edges
+        double upperBound = 0.85 * NUM_POINTS;
 
         Random random = new Random();
-        for (int i = 0; i < numZones; i++) {
-            boolean done = false;
-            while (!done){
-                int start = (int) (lowerBound + random.nextDouble() * (NUM_POINTS - zoneWidth - 1));;
-                if(start > NUM_POINTS -1 || safe_zones[start] != 1){
-                    done = true;
-                }
+        int[] landingStarts = new int[numZones]; // Track landing zone start points
+        Arrays.fill(landingStarts, -1); // Initialize with an invalid position
 
+        for (int i = 0; i < numZones; i++) {
+            boolean validZone = false;
+            int start = 0;
+
+            while (!validZone) {
+                start = (int) (lowerBound + random.nextDouble() * (upperBound - lowerBound - zoneWidth));
+
+                validZone = true;
+
+                // Check if this landing zone is too close to an existing one
+                for (int existingStart : landingStarts) {
+                    if (existingStart != -1 && Math.abs(start - existingStart) < zoneWidth * 2) {
+                        validZone = false;
+                        break;
+                    }
+                }
             }
-            int start = random.nextInt(NUM_POINTS - zoneWidth - 1);
+
+            // Save this landing zone start position
+            landingStarts[i] = start;
+
+            // Flatten terrain at the landing zone
             for (int j = 0; j < zoneWidth; j++) {
                 terrain[start + j] = terrain[start]; // Flatten segment
-                safe_zones[start + j] = i+1;
-
-
+                safe_zones[start + j] = i + 1;
             }
-            zoneWidth = zoneWidth / 2;
+
+            // Reduce zone width for the next landing zone (but not too small)
+            zoneWidth = Math.max(zoneWidth / 2, NUM_POINTS / 32);
         }
     }
+
 
     public double[] getTerrain(){
 

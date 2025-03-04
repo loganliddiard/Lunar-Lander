@@ -44,7 +44,8 @@ public class Game {
     final float FRAMETHICKNESS = 0.005f;
     private static final float LHS = -0.6f;
     private static final float TOP = -0.5f;
-
+    private float scrollOffset; // Initial position, will move up over time
+    private float scrollSpeed; // Adjust speed for smooth scrolling
     private Texture background;
 
     private SoundManager audio;
@@ -58,6 +59,8 @@ public class Game {
 
     public void initialize() {
 
+        scrollOffset = 0; // Initial position, will move up over time
+        scrollSpeed = 0.0005f; // Adjust speed for smooth scrolling
 
         highScores = new HighScores();
         serializer = new Serializer();
@@ -73,7 +76,7 @@ public class Game {
 
         level_music = audio.load("level_music", "resources/audio/Outer Space - Super Paper Mario.ogg", false);
         countdown_sound = audio.load("countdown", "resources/audio/countdown-sound-effect.ogg", false);
-        level_music.setGain(.0f);
+        level_music.setGain(.5f);
         player_ship = new Ship(audio);
         menu = new Menu(audio);
 
@@ -123,23 +126,18 @@ public class Game {
 
         //different game states use different controls
         menu_input.registerCommand(GLFW_KEY_UP,true,(double elapsedTime) -> {
-            System.out.println("UP KEY PRESSED");
 
-            menu.upOption();
-
+            if(current_state == gameStates.menu) menu.upOption();;
+            if(current_state == gameStates.game && pause) menu.pauseOptionChange();
 
         });
 
         menu_input.registerCommand(GLFW_KEY_DOWN,true,(double elapsedTime) -> {
-            System.out.println("DOWN KEY PRESSED");
-            menu.downOption();
+            if(current_state == gameStates.menu) menu.downOption();
+            if(current_state == gameStates.game && pause) menu.pauseOptionChange();
+
         });
-        menu_input.registerCommand(GLFW_KEY_RIGHT,true,(double elapsedTime) -> {
-            System.out.println("RIGHT KEY PRESSED");
-        });
-        menu_input.registerCommand(GLFW_KEY_LEFT,true,(double elapsedTime) -> {
-            System.out.println("LEFT KEY PRESSED");
-        });
+
 
         menu_input.registerCommand(GLFW_KEY_ESCAPE,true,(double elapsedTime) -> {
             if (current_state == gameStates.menu){
@@ -150,6 +148,56 @@ public class Game {
 
             }
             else current_state = gameStates.menu;
+
+        });
+
+        menu_input.registerCommand(GLFW_KEY_ENTER,true,(double elapsedTime)->{
+            if(current_state.equals(gameStates.menu)){
+                String change_to = menu.getHovering();
+                switch(change_to){
+                    case ("Start Game"):
+                        level = new Level();
+                        score = 0;
+                        pause = false;
+                        current_state = gameStates.transition;
+
+                        break;
+                    case ("View High Scores"):
+
+                        serializer.loadHighScores(highScores);
+                        current_state = gameStates.scores;
+
+                        break;
+                    case ("Credits"):
+                        scrollOffset = 0; // Initial position, will move up over time
+                        current_state = gameStates.credits;
+
+                        break;
+                    case ("Customize Controls"):
+                        current_state = gameStates.options;
+
+                        break;
+                    case ("Continue"):
+                        pause = !pause;
+                        break;
+                    case ("Quit"):
+                        current_state = gameStates.menu;
+
+                        break;
+                }
+            }
+            if(current_state.equals(gameStates.game) && pause){
+                String change_to = menu.pauseHovering();
+                switch(change_to){
+                    case ("Continue"):
+                        pause = false;
+                        if(!level_music.isPlaying()) level_music.play();
+                        break;
+                    case ("Quit"):
+                        current_state = gameStates.menu;
+                        break;
+                }
+            }
 
         });
 
@@ -177,47 +225,13 @@ public class Game {
         // Poll for window events: required in order for window, keyboard, etc events are captured.
         glfwPollEvents();
 
-        input.update(elapsedTime,graphics);
+        if(current_state == gameStates.game && !pause) input.update(elapsedTime,graphics);
+
         if (current_state != gameStates.game && current_state != gameStates.transition){
             menu_input.update(elapsedTime,graphics);
-
-        } else{
+        } else if(current_state == gameStates.game && pause){
             menu_input.update(elapsedTime,graphics);
         }
-        // If user presses ESC, then exit the program
-        if (glfwGetKey(graphics.getWindow(), GLFW_KEY_ENTER) == GLFW_PRESS){
-
-            if(current_state.equals(gameStates.menu)){
-                String change_to = menu.getHovering();
-                switch(change_to){
-                    case ("Start Game"):
-                        level = new Level();
-                        score = 0;
-                        current_state = gameStates.transition;
-
-                    break;
-                    case ("View High Scores"):
-
-                        serializer.loadHighScores(highScores);
-                        current_state = gameStates.scores;
-
-                        break;
-                    case ("Credits"):
-                        current_state = gameStates.credits;
-
-                        break;
-                    case ("Customize Controls"):
-                        current_state = gameStates.options;
-
-                        break;
-                }
-
-            }
-            System.out.println("Enter was pressed");
-
-        }
-
-
 
     }
 
@@ -325,6 +339,14 @@ public class Game {
                 break;
             // ... more cases
             case credits:
+                // Move text up
+
+                for (int i = 0; i < elapsedTime; i++){
+                    scrollOffset -= scrollSpeed; // Decrease offset over time
+                }
+
+
+
                 break;
         }
     }
@@ -339,7 +361,7 @@ public class Game {
         //Draw boarder
         Rectangle line1 = new Rectangle(LHS,TOP,screen_size,FRAMETHICKNESS);
         Rectangle line2 = new Rectangle(LHS,-TOP,screen_size,FRAMETHICKNESS);
-        Rectangle line3 = new Rectangle(-LHS,TOP,FRAMETHICKNESS,screen_height);
+        Rectangle line3 = new Rectangle(-LHS,TOP,FRAMETHICKNESS,screen_height+FRAMETHICKNESS);
         Rectangle line4 = new Rectangle(LHS,TOP,FRAMETHICKNESS,screen_height);
 
         Color frame_color = Color.WHITE;
@@ -385,6 +407,20 @@ public class Game {
                 player_ship.renderShip(graphics);
                 player_ship.renderShipHUD(graphics,sub_font);
 
+                if(pause){
+                    for(String option: menu.getPauseOptions()){
+                        if(Objects.equals(option, menu.pauseHovering())){
+                            graphics.drawTextByHeight(sub_font, option, position_x, position_y, textHeight, Color.YELLOW);
+
+                        }
+                        else{
+                            graphics.drawTextByHeight(sub_font, option, position_x, position_y, textHeight, Color.WHITE);
+                        }
+
+                        position_y = position_y + .075f;
+                    }
+                }
+
                 break;
             case transition:
                 graphics.drawTextByHeight(sub_font, "Starting in : "+String.format("%.2f",transitionDelay - (glfwGetTime() - gameStartTime)), title_position_x, title_position_y, title_textHeight, Color.WHITE);
@@ -410,7 +446,42 @@ public class Game {
                 break;
             // ... more cases
             case credits:
-                graphics.drawTextByHeight(title_font, "CREDITS", title_position_x, title_position_y, title_textHeight, Color.WHITE);
+
+                // Starting Y position (beginning from the bottom of the screen)
+                float startY = screen_height-(screen_height/2); // Start slightly off-screen
+                float yOffset = startY + scrollOffset; // Apply scroll effect
+
+                // Draw title
+                graphics.drawTextByHeight(title_font, "CREDITS", title_position_x, yOffset, textHeight, Color.WHITE);
+                yOffset += textHeight * 2; // Extra space after title
+
+                // Credits data
+                String[][] credits = {
+                        {"Dev", "Logan Liddiard"},
+                        {"Background", "ChatGPT"},
+                        {"Sound Effects", "Pixabay.com"},
+                        {"Ship Sprite", "Galaga - NAMCO - Freepik.com"},
+                        {"Music", "Title: Outer Space - Super Paper Mario"},
+                        {"Composers", "Naoko Mitome, Chika Sekigawa, Yasuhisa Baba"},
+                        {"Code Contributors", "Dean Mathias & ChatGPT"},
+                        {"Special Thanks", "Dean Mathias & ChatGPT"}
+                };
+
+                float sectionSpacing = textHeight * 1.5f; // Spacing between sections
+
+                for (String[] credit : credits) {
+                    // Only draw if text is inside the screen bounds
+                    if (yOffset + textHeight > (-screen_height / 2)+textHeight*2 && yOffset < (screen_height / 2)-textHeight*2) {
+                        graphics.drawTextByHeight(sub_font, credit[0], position_x, yOffset, textHeight, Color.WHITE);
+                        yOffset += textHeight;
+                        graphics.drawTextByHeight(sub_font, "\t" + credit[1], position_x, yOffset, textHeight, Color.WHITE);
+                        yOffset += sectionSpacing;
+                    } else {
+                        yOffset += textHeight +sectionSpacing; // Still update position, even if not drawn
+                    }
+                }
+
+
                 break;
         }
 

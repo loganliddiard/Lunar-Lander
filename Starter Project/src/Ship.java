@@ -140,7 +140,7 @@ public class Ship {
 
 
 
-        String show_fuel = "Fuel  : "+String.format("%.2f", fuel);
+        String show_fuel = "Fuel  : "+String.format("%.2f", fuel) + "s";
         String show_angle= "Angle : "+String.format("%.2f",(angle+ 90) % 360);
         String show_speed= "Speed : "+String.format("%.2f",getSpeed())+" m/s";
 
@@ -157,7 +157,7 @@ public class Ship {
                 graphics.drawTextByHeight(font,show_fuel,start_x,start_y,textHeight,Color.YELLOW);
                 break;
             default:
-                graphics.drawTextByHeight(font,show_fuel,start_x,start_y,textHeight,Color.RED);
+                graphics.drawTextByHeight(font,show_fuel,start_x,start_y,textHeight,Color.WHITE);
                 break;
         }
         if(getSpeed() <= 2){
@@ -267,14 +267,14 @@ public class Ship {
         double tempangle = (angle+ 90) % 360;
 
         if( tempangle >=355 && tempangle <=360){
-            if (tempangle == 360){
+            if (tempangle >= 358){
                 perfect_angle = 1;
             } else perfect_angle = 0;
             return true;
         }
         if (tempangle >=0 && tempangle <=5){
 
-            if (tempangle == 0){
+            if (tempangle <= 1){
                 perfect_angle = 1;
             } else perfect_angle = 0;
 
@@ -302,7 +302,7 @@ public class Ship {
     private double getSpeed() {
         double speed = Math.abs(velocity.y)*4000;
 
-        if (speed < .2){
+        if (speed < .5){
             perfect_speed = 1;
         }
         else {
