@@ -60,7 +60,7 @@ public class Game {
     public void initialize() {
 
         scrollOffset = 0; // Initial position, will move up over time
-        scrollSpeed = 0.0005f; // Adjust speed for smooth scrolling
+        scrollSpeed = 0.05f; // Adjust speed for smooth scrolling
 
         highScores = new HighScores();
         serializer = new Serializer();
@@ -347,9 +347,9 @@ public class Game {
             case credits:
                 // Move text up
 
-                for (int i = 0; i < elapsedTime; i++){
-                    scrollOffset -= scrollSpeed; // Decrease offset over time
-                }
+
+                    scrollOffset -= scrollSpeed * elapsedTime; // Decrease offset over time
+
 
 
 

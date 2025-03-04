@@ -66,8 +66,8 @@ public class Ship {
         position = new Vector2f(x, y);
         offset = new Vector2f(x-(lengths/2), y+(lengths/2));
         galaga = new Texture("resources/images/RedGalaga.png");
-        gravity = 	0.000002f;
-        base_thrust = .0006f;
+        gravity = 	0.015f;
+        base_thrust = .04f;
 
 
         particleSystem = new ParticleSystem();
@@ -191,14 +191,14 @@ public class Ship {
                 status = fuel_status.medium;
             } else{ status = fuel_status.low;}
 
-            for(var i = 0; i < elapsedTime; i++){
 
-                velocity.y += gravity;
 
-                position.x += velocity.x;
-                position.y += velocity.y;
+            velocity.y += gravity * (float) elapsedTime;
 
-            }
+            position.x += velocity.x * (float) elapsedTime;;
+            position.y += velocity.y * (float) elapsedTime;;
+
+
         }
         else if (!finished&&crashed){
             finished = true;
@@ -301,7 +301,7 @@ public class Ship {
     }
 
     private double getSpeed() {
-        double speed = Math.abs(velocity.y)*4000;
+        double speed = Math.abs(velocity.y)*100;
 
         if (speed < .5){
             perfect_speed = 1;
@@ -310,7 +310,7 @@ public class Ship {
             perfect_speed = 0;
         }
 
-        return Math.abs(velocity.y)*4000;
+        return speed;
     }
     public boolean getCrash() {
         return crashed;
