@@ -19,10 +19,8 @@ public class Level {
     public Level() {
 
         safe_spaces = 2;
-        System.out.println(safe_spaces);
         generateTerrain();
         addLandingZones();
-
 
     }
 
@@ -34,7 +32,6 @@ public class Level {
         generateTerrain();
         addLandingZones();
 
-
     }
 
     private static double gaussianRandom(Random random) {
@@ -45,33 +42,35 @@ public class Level {
         Random random = new Random();
 
         // Set initial endpoints
-        terrain[0] = Math.max(-0.20f, Math.min(0.4f, gaussianRandom(random) +.5 ));
-        terrain[NUM_POINTS - 1] = Math.max(-0.25f, Math.min(0.5f, gaussianRandom(random) +.5 ));
+        terrain[0] = Math.max(-0.20f, Math.min(0.35f, gaussianRandom(random) +.5 ));
+        terrain[NUM_POINTS - 1] = Math.max(-0.20f, Math.min(0.35f, gaussianRandom(random) +.5 ));
 
-
-        // Perform midpoint displacement
         midpointDisplacement(0, NUM_POINTS - 1, INITIAL_ROUGHNESS, random);
     }
 
     private void midpointDisplacement(int left, int right, double roughness, Random random) {
-        if (right - left <= 1) return;
 
-        int mid = (left + right) / 2;
-        double avg = (terrain[left] + terrain[right]) / 2.0;
+        if (right - left <= 1) {
+
+            return;
+        }
+
+        int mid_point = (left + right) / 2;
+        //if(safe_space[mid_point]){System.out.println("OVERLAPPING SAFESPACE" );}
+
+
+        double average = (terrain[left] + terrain[right]) / 2;
 
         double range = Math.abs(right - left) / (double) NUM_POINTS;
-        double r = roughness * gaussianRandom(random) * range;
+        double r_val = roughness * gaussianRandom(random) * range;
 
-        terrain[mid] = Math.max(-0.1f, Math.min(0.5f, avg + r));
+        terrain[mid_point] = Math.max(-0.1f, Math.min(0.5f, average + r_val ));
+        //System.out.println(terrain[mid_point] + "--");
 
+        double newRoughness = roughness * .95;
 
-
-        // Reduce roughness dynamically for smoother transitions
-        double newRoughness = roughness * 0.95; // Adjust decay factor as needed
-
-        // Recursively apply midpoint displacement
-        midpointDisplacement(left, mid, newRoughness, random);
-        midpointDisplacement(mid, right, newRoughness, random);
+        midpointDisplacement(left, mid_point, newRoughness, random);
+        midpointDisplacement(mid_point, right, newRoughness, random);
     }
 
     public void render_level(Graphics2D graphics) {
@@ -127,7 +126,7 @@ public class Level {
     }
     private void addLandingZones() {
         int numZones = this.safe_spaces; // Number of flat landing zones
-        System.out.println("Landing zones to be spawned: " + numZones);
+        //System.out.println("Landing zones to be spawned: " + numZones);
 
         int zoneWidth = (numZones != 2) ? NUM_POINTS / 16 : NUM_POINTS / 8;
 

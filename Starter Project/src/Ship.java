@@ -301,7 +301,7 @@ public class Ship {
     }
 
     private double getSpeed() {
-        double speed = Math.abs(velocity.y)*100;
+        double speed = Math.abs(velocity.y)*75;
 
         if (speed < .5){
             perfect_speed = 1;

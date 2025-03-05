@@ -83,7 +83,7 @@ public class Game {
         input = new KeyboardInput();
         menu_input = new KeyboardInput();
         pause = false;
-        level = new Level();
+        //level = new Level();
 
         font = new Font("Arial", java.awt.Font.PLAIN, 84, false);
 
@@ -348,7 +348,7 @@ public class Game {
                 // Move text up
 
 
-                    scrollOffset -= scrollSpeed * elapsedTime; // Decrease offset over time
+                    scrollOffset -= (float) (scrollSpeed * elapsedTime); // Decrease offset over time
 
 
 
@@ -433,6 +433,7 @@ public class Game {
                 break;
             case options:
                 graphics.drawTextByHeight(title_font, "OPTIONS", title_position_x, title_position_y, title_textHeight, Color.WHITE);
+                graphics.drawTextByHeight(sub_font, "Not required anymore :)", position_x, position_y, textHeight, Color.WHITE);
 
                 break;
             case scores:

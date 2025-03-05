@@ -31,7 +31,7 @@ public class Menu {
         blip = audio.load("blip", "resources/audio/retro-blip.ogg", false);
         countdown = audio.load("timer", "resources/audio/countdown-sound-effect.ogg", false);
 
-        options = new String[] {start_game, high_scores, controls,credits};
+        options = new String[] {start_game, high_scores,credits};
         pause_options = new String[] {cont,quit};
 
     }
